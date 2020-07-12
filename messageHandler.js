@@ -52,8 +52,10 @@ function handleList(msg, command) {
       msg.guild.roles.cache,
       availableCategories
     );
-    Object.keys(rolesByCategory).forEach((category) => {
-      reply += `**${category}** : ${rolesByCategory[category].join(", ")}\n`;
+    ["autre", ...Object.values(availableCategories)].forEach((category) => {
+      reply += `**${category}** : ${
+        rolesByCategory[category] ? rolesByCategory[category].join(", ") : ""
+      }\n`;
     });
     handleError(msg, undefined, reply);
     return;
