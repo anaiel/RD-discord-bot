@@ -35,6 +35,7 @@ function parseMsg(msg) {
 function handleList(msg, command) {
   const availableCategories = {
     1752220: "ligues",
+    15158332: "pronoms",
   };
 
   if (
@@ -124,6 +125,7 @@ function handleRole(msg, command) {
 function handleCreate(msg, command) {
   const availableCategories = {
     ligues: 1752220,
+    pronoms: 15158332,
   };
 
   if (!availableCategories[command[0]]) {
