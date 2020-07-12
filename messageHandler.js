@@ -3,7 +3,7 @@ const { handleError } = require("./handleError.js");
 exports.messageHandler = function (msg) {
   if (msg.content.charAt(0) !== "!") return;
 
-  const command = msg.content.slice(1).split(" ");
+  const command = parseMsg(msg.content);
   const availableCommands = {
     aide: handleHelp,
     // créer: handleCreate,
@@ -48,6 +48,19 @@ function handleList(msg, command) {
   }
 
   msg.reply(reply);
+}
+
+function parseMsg(msg) {
+  return msg
+    .slice(1)
+    .split('"')
+    .map((msgPart) => msgPart.trim())
+    .reduce((commands, msgPart, i) => {
+      if (!msgPart) return commands;
+      if (i % 2 === 0) commands = [...commands, ...msgPart.split(" ")];
+      else commands.push(msgPart.trim());
+      return commands;
+    }, []);
 }
 
 function getAllRoles(roles, availableCategories) {
