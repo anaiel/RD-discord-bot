@@ -24,7 +24,12 @@ function handleList(msg, command) {
   };
   let reply = "";
 
-  if (!command[0] || !availableCategories[command[0]]) {
+  if (
+    !command[0] ||
+    Object.entries(availableCategories).find(
+      (category) => category === command[0]
+    ) === -1
+  ) {
     if (command[0])
       reply +=
         "La catégorie demandée n'existe pas. Voici tous les rôles disponibles : \n";
@@ -36,9 +41,10 @@ function handleList(msg, command) {
       reply += `**${category}** : ${rolesByCategory[category].join(", ")}\n`;
     });
   } else {
-    const roles = msg.guild.roles.filter(
-      (role) => availableCategories[role.color] === command[0]
-    );
+    const roles = msg.guild.roles.cache
+      .filter((role) => availableCategories[role.color] === command[0])
+      .map((role) => role.name);
+    console.log(roles);
     reply += `**${command[0]}** : ${roles.join(", ")}\n`;
   }
 
