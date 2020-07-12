@@ -1,5 +1,6 @@
 const { handleError } = require("./handleError.js");
 const { handleSuccess } = require("./handleSuccess.js");
+const { RoleCategories } = require("./RoleCategory.js");
 
 exports.messageHandler = function (msg) {
   if (msg.content.charAt(0) !== "!") return;
@@ -33,10 +34,7 @@ function parseMsg(msg) {
 }
 
 function handleList(msg, command) {
-  const availableCategories = {
-    1752220: "ligues",
-    15158332: "pronoms",
-  };
+  const availableCategories = RoleCategories.discordReadable();
 
   if (
     !command[0] ||
@@ -57,7 +55,7 @@ function handleList(msg, command) {
         rolesByCategory[category] ? rolesByCategory[category].join(", ") : ""
       }\n`;
     });
-    handleError(msg, undefined, reply);
+    msg.reply(reply);
     return;
   }
 
@@ -121,10 +119,7 @@ function handleRole(msg, command) {
 }
 
 function handleCreate(msg, command) {
-  const availableCategories = {
-    ligues: 1752220,
-    pronoms: 15158332,
-  };
+  const availableCategories = RoleCategories.humanReadable();
 
   if (!availableCategories[command[0]]) {
     let errorMsg = `La catégorie ${
