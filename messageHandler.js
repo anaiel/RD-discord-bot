@@ -6,7 +6,7 @@ exports.messageHandler = function (msg) {
   const command = parseMsg(msg.content);
   const availableCommands = {
     aide: handleHelp,
-    // créer: handleCreate,
+    créer: handleCreate,
     liste: handleList,
     role: handleRole,
   };
@@ -108,5 +108,36 @@ function handleRole(msg, command) {
     msg.member.roles.add(role).catch((err) => {
       handleError(msg, err, `Le rôle ${role.name} n'a pas pu être ajouté.`);
     });
+  });
+}
+
+function handleCreate(msg, command) {
+  const availableCategories = {
+    ligues: 1752220,
+  };
+
+  if (!availableCategories[command[0]]) {
+    let errorMsg = `La catégorie ${
+      command[0]
+    } n'existe pas. Les catégories disponibles sont: ${Object.keys(
+      availableCategories
+    ).join(", ")}.`;
+    handleError(msg, undefined, errorMsg);
+    return;
+  }
+  if (!command[1]) {
+    handleError(msg, undefined, "Veuillez préciser le nom de la ligue.");
+    return;
+  }
+
+  const options = {
+    data: {
+      name: command[1],
+      color: availableCategories[command[0]],
+      mentionable: true,
+    },
+  };
+  msg.guild.roles.create(options).catch((err) => {
+    handleError(msg, err, "Le rôle n'a pas pu être créé");
   });
 }
