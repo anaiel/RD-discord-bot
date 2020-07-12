@@ -1,4 +1,5 @@
 const { handleError } = require("./handleError.js");
+const { handleSuccess } = require("./handleSuccess.js");
 
 exports.messageHandler = function (msg) {
   if (msg.content.charAt(0) !== "!") return;
@@ -105,11 +106,18 @@ function handleRole(msg, command) {
     handleError(msg, undefined, rejectedMessage);
   }
 
+  let isAdded = false;
   roles.forEach((role) => {
-    msg.member.roles.add(role).catch((err) => {
-      handleError(msg, err, `Le rôle ${role.name} n'a pas pu être ajouté.`);
-    });
+    msg.member.roles
+      .add(role)
+      .then(() => {
+        isAdded = true;
+      })
+      .catch((err) => {
+        handleError(msg, err, `Le rôle ${role.name} n'a pas pu être ajouté.`);
+      });
   });
+  if (isAdded) handleSuccess(msg);
 }
 
 function handleCreate(msg, command) {
@@ -141,4 +149,5 @@ function handleCreate(msg, command) {
   msg.guild.roles.create(options).catch((err) => {
     handleError(msg, err, "Le rôle n'a pas pu être créé");
   });
+  handleSuccess(msg);
 }

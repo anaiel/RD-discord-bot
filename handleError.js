@@ -4,4 +4,5 @@ exports.handleError = function (msg, err, userMsg) {
     console.log(err);
   }
   msg.reply(userMsg);
+  msg.react("❌");
 };
