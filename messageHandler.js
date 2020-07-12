@@ -5,7 +5,7 @@ exports.messageHandler = function (msg) {
 
   const command = msg.content.slice(1).split(" ");
   const availableCommands = {
-    // aide: handleHelp,
+    aide: handleHelp,
     // créer: handleCreate,
     liste: handleList,
     // role: handleRole,
@@ -53,4 +53,13 @@ function getAllRoles(roles, availableCategories) {
     else rolesByCategory[category].push(role.name);
   });
   return rolesByCategory;
+}
+
+function handleHelp(msg, command) {
+  const helpMsg = `
+**Liste des commandes disponibles** :
+- \`!aide\` : aide sur les commandes.
+- \`!liste\` : liste les rôles disponibles. Il est possible de réclamer une catégorie en particulier avec \`!liste nom-de-la-catégorie\`.
+  `;
+  msg.reply(helpMsg);
 }
