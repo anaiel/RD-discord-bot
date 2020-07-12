@@ -8,7 +8,7 @@ exports.messageHandler = function (msg) {
     aide: handleHelp,
     // créer: handleCreate,
     liste: handleList,
-    // role: handleRole,
+    role: handleRole,
   };
 
   if (!availableCommands[command[0]]) {
@@ -80,6 +80,33 @@ function handleHelp(msg, command) {
 **Liste des commandes disponibles** :
 - \`!aide\` : aide sur les commandes.
 - \`!liste\` : liste les rôles disponibles. Il est possible de réclamer une catégorie en particulier avec \`!liste nom-de-la-catégorie\`.
+- \`!role nom-du-role nom-d'un-autre-role\` : ajouter un/des rôles (à soi même).  
   `;
   msg.reply(helpMsg);
+}
+
+function handleRole(msg, command) {
+  const roles = [];
+  const rejectedRoleNames = [];
+
+  command.forEach((item) => {
+    const role = msg.guild.roles.cache.find((role) => role.name === item);
+    if (role) roles.push(role);
+    else rejectedRoleNames.push(item);
+  });
+
+  if (rejectedRoleNames.length) {
+    let rejectedMessage = `Le${rejectedRoleNames.length > 1 ? "s" : ""} role${
+      rejectedRoleNames.length > 1 ? "s" : ""
+    } ${rejectedRoleNames.join(", ")} n'existe${
+      rejectedRoleNames.length > 1 ? "nt" : ""
+    } pas.`;
+    handleError(msg, undefined, rejectedMessage);
+  }
+
+  roles.forEach((role) => {
+    msg.member.roles.add(role).catch((err) => {
+      handleError(msg, err, `Le rôle ${role.name} n'a pas pu être ajouté.`);
+    });
+  });
 }
