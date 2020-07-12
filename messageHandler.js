@@ -26,9 +26,9 @@ function handleList(msg, command) {
 
   if (
     !command[0] ||
-    Object.entries(availableCategories).find(
+    !Object.entries(availableCategories).find(
       (category) => category === command[0]
-    ) === -1
+    )
   ) {
     if (command[0])
       reply +=
@@ -44,7 +44,6 @@ function handleList(msg, command) {
     const roles = msg.guild.roles.cache
       .filter((role) => availableCategories[role.color] === command[0])
       .map((role) => role.name);
-    console.log(roles);
     reply += `**${command[0]}** : ${roles.join(", ")}\n`;
   }
 
