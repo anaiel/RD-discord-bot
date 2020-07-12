@@ -18,6 +18,19 @@ exports.messageHandler = function (msg) {
   availableCommands[command[0]](msg, command.slice(1));
 };
 
+function parseMsg(msg) {
+  return msg
+    .slice(1)
+    .split('"')
+    .map((msgPart) => msgPart.trim())
+    .reduce((commands, msgPart, i) => {
+      if (!msgPart) return commands;
+      if (i % 2 === 0) commands = [...commands, ...msgPart.split(" ")];
+      else commands.push(msgPart.trim());
+      return commands;
+    }, []);
+}
+
 function handleList(msg, command) {
   const availableCategories = {
     1752220: "ligues",
@@ -48,19 +61,6 @@ function handleList(msg, command) {
   }
 
   msg.reply(reply);
-}
-
-function parseMsg(msg) {
-  return msg
-    .slice(1)
-    .split('"')
-    .map((msgPart) => msgPart.trim())
-    .reduce((commands, msgPart, i) => {
-      if (!msgPart) return commands;
-      if (i % 2 === 0) commands = [...commands, ...msgPart.split(" ")];
-      else commands.push(msgPart.trim());
-      return commands;
-    }, []);
 }
 
 function getAllRoles(roles, availableCategories) {
