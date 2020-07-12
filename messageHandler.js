@@ -12,7 +12,7 @@ exports.messageHandler = function (msg) {
   };
 
   if (!availableCommands[command[0]]) {
-    handleError(msg, "Je ne connais pas cette commande.");
+    handleError(msg, undefined, "Je ne connais pas cette commande.");
     return;
   }
   availableCommands[command[0]](msg, command.slice(1));
@@ -35,7 +35,6 @@ function handleList(msg, command) {
   const availableCategories = {
     1752220: "ligues",
   };
-  let reply = "";
 
   if (
     !command[0] ||
@@ -43,6 +42,7 @@ function handleList(msg, command) {
       (category) => category === command[0]
     )
   ) {
+    let reply = "";
     if (command[0])
       reply +=
         "La catégorie demandée n'existe pas. Voici tous les rôles disponibles : \n";
@@ -53,13 +53,15 @@ function handleList(msg, command) {
     Object.keys(rolesByCategory).forEach((category) => {
       reply += `**${category}** : ${rolesByCategory[category].join(", ")}\n`;
     });
-  } else {
-    const roles = msg.guild.roles.cache
-      .filter((role) => availableCategories[role.color] === command[0])
-      .map((role) => role.name);
-    reply += `**${command[0]}** : ${roles.join(", ")}\n`;
+    handleError(msg, undefined, reply);
+    return;
   }
 
+  let reply = "";
+  const roles = msg.guild.roles.cache
+    .filter((role) => availableCategories[role.color] === command[0])
+    .map((role) => role.name);
+  reply += `**${command[0]}** : ${roles.join(", ")}\n`;
   msg.reply(reply);
 }
 

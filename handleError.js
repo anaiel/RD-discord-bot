@@ -1,3 +1,4 @@
-exports.handleError = function (msg, errorMsg) {
-  msg.reply(errorMsg);
+exports.handleError = function (msg, err, userMsg) {
+  if (err) console.log(err);
+  msg.reply(userMsg);
 };
