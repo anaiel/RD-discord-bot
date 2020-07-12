@@ -80,7 +80,8 @@ function handleHelp(msg, command) {
 **Liste des commandes disponibles** :
 - \`!aide\` : aide sur les commandes.
 - \`!liste\` : liste les rôles disponibles. Il est possible de réclamer une catégorie en particulier avec \`!liste nom-de-la-catégorie\`.
-- \`!role nom-du-role nom-d'un-autre-role\` : ajouter un/des rôles (à soi même).  
+- \`!role nom-du-role nom-d'un-autre-role\` : ajouter un/des rôles (à soi même).
+- \`!créer nom-de-la-categorie nom-du-role\` : créer un rôle.
   `;
   msg.reply(helpMsg);
 }
