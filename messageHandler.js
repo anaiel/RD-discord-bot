@@ -83,6 +83,7 @@ function handleHelp(msg, command) {
 - \`!liste\` : liste les rôles disponibles. Il est possible de réclamer une catégorie en particulier avec \`!liste nom-de-la-catégorie\`.
 - \`!role nom-du-role nom-d'un-autre-role\` : ajouter un/des rôles (à soi même).
 - \`!créer nom-de-la-categorie nom-du-role\` : créer un rôle.
+En cas de problème, ou pour ajouter des catégories ou des fonctionnalités, appelez les \`@botdoctors\`!
   `;
   msg.reply(helpMsg);
 }
