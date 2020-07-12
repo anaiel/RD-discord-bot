@@ -1,4 +1,7 @@
 exports.handleError = function (msg, err, userMsg) {
-  if (err) console.log(err);
+  if (err) {
+    userMsg += " J'en appelle au @botdoctor !";
+    console.log(err);
+  }
   msg.reply(userMsg);
 };
