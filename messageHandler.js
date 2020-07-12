@@ -38,7 +38,7 @@ function handleList(msg, command) {
 
   if (
     !command[0] ||
-    !Object.entries(availableCategories).find(
+    !Object.values(availableCategories).find(
       (category) => category === command[0]
     )
   ) {
