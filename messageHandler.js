@@ -34,47 +34,32 @@ function parseMsg(msg) {
 }
 
 function handleList(msg, command) {
-  const availableCategories = RoleCategories.discordReadable();
-
-  if (
-    !command[0] ||
-    !Object.values(availableCategories).find(
-      (category) => category === command[0]
-    )
-  ) {
-    let reply = "";
-    if (command[0])
-      reply +=
-        "La catégorie demandée n'existe pas. Voici tous les rôles disponibles : \n";
-    const rolesByCategory = getAllRoles(
-      msg.guild.roles.cache,
-      availableCategories
-    );
-    ["autre", ...Object.values(availableCategories)].forEach((category) => {
-      reply += `**${category}** : ${
-        rolesByCategory[category] ? rolesByCategory[category].join(", ") : ""
-      }\n`;
-    });
-    msg.reply(reply);
-    return;
-  }
+  const availableCategories = RoleCategories.all();
+  let requestedCategories = command[0]
+    ? availableCategories.filter((availableCategory) =>
+        command.find(
+          (requestedCategory) => requestedCategory === availableCategory.name
+        )
+      )
+    : [];
 
   let reply = "";
-  const roles = msg.guild.roles.cache
-    .filter((role) => availableCategories[role.color] === command[0])
-    .map((role) => role.name);
-  reply += `**${command[0]}** : ${roles.join(", ")}\n`;
-  msg.reply(reply);
-}
-
-function getAllRoles(roles, availableCategories) {
-  const rolesByCategory = {};
-  roles.forEach((role) => {
-    const category = availableCategories[role.color] || "autre";
-    if (!rolesByCategory[category]) rolesByCategory[category] = [role.name];
-    else rolesByCategory[category].push(role.name);
+  if (requestedCategories.length === 0 && command[0])
+    reply +=
+      "La catégorie demandée n'existe pas. Voici tous les rôles disponibles : \n";
+  if (requestedCategories.length === 0)
+    requestedCategories = availableCategories;
+  requestedCategories.forEach((category) => {
+    reply += `**${category.name}** : `;
+    reply +=
+      msg.guild.roles.cache
+        .filter((role) => role.color === category.color)
+        .map((role) => role.name)
+        .join(", ") || "aucun rôle existant";
+    reply += "\n";
   });
-  return rolesByCategory;
+  msg.reply(reply);
+  return;
 }
 
 function handleHelp(msg, command) {
@@ -119,31 +104,43 @@ function handleRole(msg, command) {
 }
 
 function handleCreate(msg, command) {
-  const availableCategories = RoleCategories.humanReadable();
-
-  if (!availableCategories[command[0]]) {
-    let errorMsg = `La catégorie ${
-      command[0]
-    } n'existe pas. Les catégories disponibles sont: ${Object.keys(
-      availableCategories
-    ).join(", ")}.`;
-    handleError(msg, undefined, errorMsg);
-    return;
-  }
   if (!command[1]) {
-    handleError(msg, undefined, "Veuillez préciser le nom de la ligue.");
+    handleError(
+      msg,
+      undefined,
+      `Veuillez préciser${
+        command[0] ? " une catégorie et" : ""
+      } le(s) rôle(s) à créer.`
+    );
     return;
   }
 
-  const options = {
-    data: {
-      name: command[1],
-      color: availableCategories[command[0]],
-      mentionable: true,
-    },
-  };
-  msg.guild.roles.create(options).catch((err) => {
-    handleError(msg, err, "Le rôle n'a pas pu être créé");
+  const availableCategories = RoleCategories.all();
+  const requestedCategory = availableCategories.find(
+    (availableCategory) => availableCategory.name === command[0]
+  );
+  if (!requestedCategory)
+    handleError(
+      msg,
+      undefined,
+      `La catégorie ${command[0]} n'existe pas. Utilisez \`!liste\` pour voir toutes les catégories.`
+    );
+
+  const requestedRoles = command.slice(1);
+  requestedRoles.forEach((requestedRole) => {
+    const options = {
+      data: {
+        name: requestedRole,
+        color: requestedCategory.color,
+        mentionable: requestedCategory.mentionable,
+        permissions: requestedCategory.permissions,
+      },
+    };
+    msg.guild.roles
+      .create(options)
+      .then(() => handleSuccess(msg))
+      .catch((err) => {
+        handleError(msg, err, `Le rôle ${requestedRole} n'a pas pu être créé.`);
+      });
   });
-  handleSuccess(msg);
 }
