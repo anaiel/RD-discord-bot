@@ -1,16 +1,19 @@
 exports.RoleCategories = {
-  _byName: {
-    ligues: 1752220,
-    pronoms: 15158332,
-  },
-  humanReadable: function () {
-    return this._byName;
-  },
-  discordReadable: function () {
-    const result = {};
-    Object.keys(this._byName).forEach((key) => {
-      result[this._byName[key]] = key;
-    });
-    return result;
+  _data: Object.freeze([
+    Object.freeze({
+      name: "ligues",
+      color: 1752220,
+      mentionable: true,
+      permissions: 1144114257,
+    }),
+    Object.freeze({
+      name: "pronoms",
+      color: 15158332,
+      mentionable: false,
+      permissions: 1412549713,
+    }),
+  ]),
+  all: function () {
+    return this._data;
   },
 };
