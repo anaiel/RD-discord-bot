@@ -120,12 +120,14 @@ function handleCreate(msg, command) {
   const requestedCategory = availableCategories.find(
     (availableCategory) => availableCategory.name === command[0]
   );
-  if (!requestedCategory)
+  if (!requestedCategory) {
     handleError(
       msg,
       undefined,
       `La catégorie ${command[0]} n'existe pas. Utilisez \`!liste\` pour voir toutes les catégories.`
     );
+    return;
+  }
 
   const requestedRoles = command.slice(1);
   requestedRoles.forEach((requestedRole) => {
