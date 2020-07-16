@@ -18,3 +18,5 @@ Usability:
 Features:
 
 - [x] Send message to new members
+- [x] Add command `!<category> <role>` that creates roles if necessary and adds it
+- [x] Add command `!deleteAllRoles` (test mode only)
