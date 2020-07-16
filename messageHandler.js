@@ -193,7 +193,6 @@ function handleSuperCommand(msg, command) {
           },
         })
         .then((createdRole) => {
-          console.log(requestedRole);
           msg.member.roles
             .add(createdRole)
             .then(() => {
