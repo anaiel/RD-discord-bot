@@ -11,13 +11,14 @@ exports.messageHandler = function (msg) {
     créer: handleCreate,
     liste: handleList,
     role: handleRole,
+    deleteAllRoles: deleteAllRoles,
   };
 
-  if (!availableCommands[command[0]]) {
-    handleError(msg, undefined, "Je ne connais pas cette commande.");
-    return;
-  }
-  availableCommands[command[0]](msg, command.slice(1));
+  if (availableCommands[command[0]])
+    availableCommands[command[0]](msg, command.slice(1));
+  else if (RoleCategories.names().includes(command[0]))
+    handleSuperCommand(msg, command);
+  else handleError(msg, undefined, "Je ne connais pas cette commande.");
 };
 
 function parseMsg(msg) {
@@ -63,13 +64,27 @@ function handleList(msg, command) {
 }
 
 function handleHelp(msg, command) {
-  const helpMsg = `
+  let helpMsg = `
 Bonjour ! Je suis le bot qui te permet d'ajouter les rôles correspondant à ta lique et à tes pronoms !
-1 - Vérifie si la ligue et les pronoms on déjà été créés avec la commande \`!liste\` (ou \`!liste pronoms\` ou \`!liste ligues\`)
-2 - Si ils existent déjà, tu peux t'ajouter les rôles avec \`!role\` + le nom du rôle (il faut utiliser des guillemets pour les noms avec des espaces)
-3 - Si ils n'existent pas, tu peux les créer avec les commandes:
-        * \`!créer ligues\` + les noms des ligues que tu veux créer (utilise des guillemets pour les noms avec des espaces, par exemple \`!créer ligues PRG "Quads de Paris"\`)
-        * \`!créer pronoms\` + les pronoms que tu veux ajouter
+1. Utilise la commande \`!liste\` (ou \`!liste pronoms\` ou \`!liste ligues\`) pour vérifier si ta/tes ligue(s) et tes pronoms ont déjà été créés.
+2. Utilise les commandes:
+    * \`!pronoms\` + tes pronoms
+    * \`!ligues\` + ta/tes ligues
+   pour obtenir ces rôles. Attention à utiliser des guillemets si il y a des espaces (par exemple: \`!ligues "Les Quads de Paris"\`)
+
+En cas de problème, appelle les @botdoctors.`;
+
+  if (command[0] !== "tout")
+    helpMsg += "\nUtilise `!aide tout` pour voir toutes les commandes.";
+  else
+    helpMsg += `
+    
+Toutes les commandes :
+- \`!aide\` pour afficher ce message
+- \`!liste ["nom de la catégorie"]\` pour afficher tous les rôles ou les rôles liés à une catéforie (ligues ou pronoms)
+- \`!créer "nom de la catégorie" "nom du role" ["nom d'un autre role" ...]\` pour créer un.e/des pronoms ou ligues
+- \`!role "nom du role" ["nom d'un autre role"]\` pour s'ajouter un rôle existant
+- \`!"nom de la catégorie" "nom du role" ["nom d'un autre role"]\` pour s'ajouter un.e/des ligues ou pronoms existants ou pas
 `;
   msg.reply(helpMsg);
 }
@@ -145,5 +160,83 @@ function handleCreate(msg, command) {
       .catch((err) => {
         handleError(msg, err, `Le rôle ${requestedRole} n'a pas pu être créé.`);
       });
+  });
+}
+
+function handleSuperCommand(msg, command) {
+  const category = RoleCategories.all().find(
+    (availableCategory) => availableCategory.name === command[0]
+  );
+
+  command.slice(1).forEach((requestedRole) => {
+    const role = msg.guild.roles.cache.find(
+      (existingRole) => existingRole.name === requestedRole
+    );
+
+    if (role && role.color !== category.color) {
+      handleError(
+        msg,
+        undefined,
+        `Le rôle ${requestedRole} existe déjà dans une autre catégorie. Utilise la bonne catégorie ou change le nom du rôle.`
+      );
+      return;
+    }
+
+    if (!role) {
+      msg.guild.roles
+        .create({
+          data: {
+            name: requestedRole,
+            color: category.color,
+            mentionable: category.mentionable,
+            permissions: category.permissions,
+          },
+        })
+        .then((createdRole) => {
+          console.log(requestedRole);
+          msg.member.roles
+            .add(createdRole)
+            .then(() => {
+              handleSuccess(msg);
+            })
+            .catch((err) => {
+              handleError(
+                msg,
+                err,
+                `Le role ${requestedRole} n'a pas pu être ajouté.`
+              );
+            });
+        });
+    } else {
+      msg.member.roles
+        .add(role)
+        .then(() => {
+          handleSuccess(msg);
+        })
+        .catch((err) => {
+          handleError(
+            msg,
+            err,
+            `Le role ${requestedRole} n'a pas pu être ajouté.`
+          );
+        });
+    }
+  });
+}
+
+function deleteAllRoles(msg, command) {
+  if (process.env.TEST_MODE !== "true") return;
+
+  const categories = RoleCategories.colors();
+  msg.guild.roles.cache.forEach((role) => {
+    if (categories.includes(role.color))
+      role
+        .delete()
+        .then(() => {
+          console.log(`Role ${role.name} deleted successfully.`);
+        })
+        .catch((err) => {
+          console.warn(`Role ${role.name} was not deleted: ${err}`);
+        });
   });
 }

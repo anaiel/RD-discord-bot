@@ -28,4 +28,10 @@ exports.RoleCategories = {
   all: function () {
     return this._data;
   },
+  names: function () {
+    return this._data.map((category) => category.name);
+  },
+  colors: function () {
+    return this._data.map((category) => category.color);
+  },
 };
