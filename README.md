@@ -6,11 +6,15 @@ Bot discord pour un le serveur Inclusion et Diversité - Comité des Comités
 
 ### 2020-07-16
 
-Bugs :
+Bugs:
 
 - [x] Fix crash when trying to create role for non-existant category
 - [x] Fix adding checkmark reaction when assigning role that doesn't exist
 
-Usability :
+Usability:
 
 - [x] Improve help menu
+
+Features:
+
+- [x] Send message to new members
