@@ -13,4 +13,4 @@ Bugs :
 
 Usability :
 
-- [] Improve help menu
+- [x] Improve help menu

@@ -64,13 +64,13 @@ function handleList(msg, command) {
 
 function handleHelp(msg, command) {
   const helpMsg = `
-**Liste des commandes disponibles** :
-- \`!aide\` : aide sur les commandes.
-- \`!liste\` : liste les rôles disponibles. Il est possible de réclamer une catégorie en particulier avec \`!liste nom-de-la-catégorie\`.
-- \`!role nom-du-role nom-d'un-autre-role\` : ajouter un/des rôles (à soi même).
-- \`!créer nom-de-la-categorie nom-du-role\` : créer un rôle.
-En cas de problème, ou pour ajouter des catégories ou des fonctionnalités, appelez les \`@botdoctors\`!
-  `;
+Bonjour ! Je suis le bot qui te permet d'ajouter les rôles correspondant à ta lique et à tes pronoms !
+1 - Vérifie si la ligue et les pronoms on déjà été créés avec la commande \`!liste\` (ou \`!liste pronoms\` ou \`!liste ligues\`)
+2 - Si ils existent déjà, tu peux t'ajouter les rôles avec \`!role\` + le nom du rôle (il faut utiliser des guillemets pour les noms avec des espaces)
+3 - Si ils n'existent pas, tu peux les créer avec les commandes:
+        * \`!créer ligues\` + les noms des ligues que tu veux créer (utilise des guillemets pour les noms avec des espaces, par exemple \`!créer ligues PRG "Quads de Paris"\`)
+        * \`!créer pronoms\` + les pronoms que tu veux ajouter
+`;
   msg.reply(helpMsg);
 }
 
