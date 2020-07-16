@@ -93,14 +93,15 @@ function handleRole(msg, command) {
     handleError(msg, undefined, rejectedMessage);
   }
 
-  msg.member.roles
-    .add(roles)
-    .then(() => {
-      handleSuccess(msg);
-    })
-    .catch((err) => {
-      handleError(msg, err, "Un rôle n'a pas pu être ajouté.");
-    });
+  if (roles.length > 0)
+    msg.member.roles
+      .add(roles)
+      .then(() => {
+        handleSuccess(msg);
+      })
+      .catch((err) => {
+        handleError(msg, err, "Un rôle n'a pas pu être ajouté.");
+      });
 }
 
 function handleCreate(msg, command) {

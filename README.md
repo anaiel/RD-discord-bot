@@ -8,9 +8,8 @@ Bot discord pour un le serveur Inclusion et Diversité - Comité des Comités
 
 Bugs :
 
-- [] Fix crash when trying to list role of non-existant category
-- [] Fix adding checkmark reaction when assigning role that doesn't exist
-- [] Fix crash when trying to create role for non-existant category
+- [x] Fix crash when trying to create role for non-existant category
+- [x] Fix adding checkmark reaction when assigning role that doesn't exist
 
 Usability :
 
