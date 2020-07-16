@@ -13,11 +13,11 @@ exports.messageHandler = function (msg) {
     role: handleRole,
   };
 
-  if (!availableCommands[command[0]]) {
-    handleError(msg, undefined, "Je ne connais pas cette commande.");
-    return;
-  }
-  availableCommands[command[0]](msg, command.slice(1));
+  if (availableCommands[command[0]])
+    availableCommands[command[0]](msg, command.slice(1));
+  else if (RoleCategories.names().includes(command[0]))
+    handleSuperCommand(msg, command);
+  else handleError(msg, undefined, "Je ne connais pas cette commande.");
 };
 
 function parseMsg(msg) {
@@ -145,5 +145,66 @@ function handleCreate(msg, command) {
       .catch((err) => {
         handleError(msg, err, `Le rôle ${requestedRole} n'a pas pu être créé.`);
       });
+  });
+}
+
+function handleSuperCommand(msg, command) {
+  const category = RoleCategories.all().find(
+    (availableCategory) => availableCategory.name === command[0]
+  );
+
+  command.slice(1).forEach((requestedRole) => {
+    const role = msg.guild.roles.cache.find(
+      (existingRole) => existingRole.name === requestedRole
+    );
+
+    if (role && role.color !== category.color) {
+      handleError(
+        msg,
+        undefined,
+        `Le rôle ${requestedRole} existe déjà dans une autre catégorie. Utilise la bonne catégorie ou change le nom du rôle.`
+      );
+      return;
+    }
+
+    if (!role) {
+      msg.guild.roles
+        .create({
+          data: {
+            name: requestedRole,
+            color: category.color,
+            mentionable: category.mentionable,
+            permissions: category.permissions,
+          },
+        })
+        .then((createdRole) => {
+          console.log(requestedRole);
+          msg.member.roles
+            .add(createdRole)
+            .then(() => {
+              handleSuccess(msg);
+            })
+            .catch((err) => {
+              handleError(
+                msg,
+                err,
+                `Le role ${requestedRole} n'a pas pu être ajouté.`
+              );
+            });
+        });
+    } else {
+      msg.member.roles
+        .add(role)
+        .then(() => {
+          handleSuccess(msg);
+        })
+        .catch((err) => {
+          handleError(
+            msg,
+            err,
+            `Le role ${requestedRole} n'a pas pu être ajouté.`
+          );
+        });
+    }
   });
 }
