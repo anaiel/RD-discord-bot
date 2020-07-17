@@ -1,40 +1,6 @@
-const { handleError } = require("./handleError.js");
-const { handleSuccess } = require("./handleSuccess.js");
-const { RoleCategories } = require("./RoleCategory.js");
+const { RoleCategories } = require("./RoleCategory");
 
-exports.messageHandler = function (msg) {
-  if (msg.content.charAt(0) !== "!") return;
-
-  const command = parseMsg(msg.content);
-  const availableCommands = {
-    aide: handleHelp,
-    créer: handleCreate,
-    liste: handleList,
-    role: handleRole,
-    deleteAllRoles: deleteAllRoles,
-  };
-
-  if (availableCommands[command[0]])
-    availableCommands[command[0]](msg, command.slice(1));
-  else if (RoleCategories.names().includes(command[0]))
-    handleSuperCommand(msg, command);
-  else handleError(msg, undefined, "Je ne connais pas cette commande.");
-};
-
-function parseMsg(msg) {
-  return msg
-    .slice(1)
-    .split('"')
-    .map((msgPart) => msgPart.trim())
-    .reduce((commands, msgPart, i) => {
-      if (!msgPart) return commands;
-      if (i % 2 === 0) commands = [...commands, ...msgPart.split(" ")];
-      else commands.push(msgPart.trim());
-      return commands;
-    }, []);
-}
-
-function handleList(msg, command) {
+exports.handleList = function (msg, command) {
   const availableCategories = RoleCategories.all();
   let requestedCategories = command[0]
     ? availableCategories.filter((availableCategory) =>
@@ -61,9 +27,9 @@ function handleList(msg, command) {
   });
   msg.reply(reply);
   return;
-}
+};
 
-function handleHelp(msg, command) {
+exports.handleHelp = function (msg, command) {
   let helpMsg = `
 Bonjour ! Je suis le bot qui te permet d'ajouter les rôles correspondant à ta lique et à tes pronoms !
 1. Utilise la commande \`!liste\` (ou \`!liste pronoms\` ou \`!liste ligues\`) pour vérifier si ta/tes ligue(s) et tes pronoms ont déjà été créés.
@@ -87,9 +53,9 @@ Toutes les commandes :
 - \`!"nom de la catégorie" "nom du role" ["nom d'un autre role"]\` pour s'ajouter un.e/des ligues ou pronoms existants ou pas
 `;
   msg.reply(helpMsg);
-}
+};
 
-function handleRole(msg, command) {
+exports.handleRole = function (msg, command) {
   const roles = [];
   const rejectedRoleNames = [];
 
@@ -117,9 +83,9 @@ function handleRole(msg, command) {
       .catch((err) => {
         handleError(msg, err, "Un rôle n'a pas pu être ajouté.");
       });
-}
+};
 
-function handleCreate(msg, command) {
+exports.handleCreate = function (msg, command) {
   if (!command[1]) {
     handleError(
       msg,
@@ -161,9 +127,9 @@ function handleCreate(msg, command) {
         handleError(msg, err, `Le rôle ${requestedRole} n'a pas pu être créé.`);
       });
   });
-}
+};
 
-function handleSuperCommand(msg, command) {
+exports.handleSuperCommand = function (msg, command) {
   const category = RoleCategories.all().find(
     (availableCategory) => availableCategory.name === command[0]
   );
@@ -221,21 +187,4 @@ function handleSuperCommand(msg, command) {
         });
     }
   });
-}
-
-function deleteAllRoles(msg, command) {
-  if (process.env.TEST_MODE !== "true") return;
-
-  const categories = RoleCategories.colors();
-  msg.guild.roles.cache.forEach((role) => {
-    if (categories.includes(role.color))
-      role
-        .delete()
-        .then(() => {
-          console.log(`Role ${role.name} deleted successfully.`);
-        })
-        .catch((err) => {
-          console.warn(`Role ${role.name} was not deleted: ${err}`);
-        });
-  });
-}
+};

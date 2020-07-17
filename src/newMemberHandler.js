@@ -1,7 +1,7 @@
 const fs = require("fs");
 
 exports.newMemberHandler = function (member) {
-  fs.readFile("./welcome-message.txt", "utf8", (err, data) => {
+  fs.readFile("./new-member/welcome-message.txt", "utf8", (err, data) => {
     if (err) {
       console.log(err);
       return;
